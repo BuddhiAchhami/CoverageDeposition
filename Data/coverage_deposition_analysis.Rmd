@@ -1,0 +1,83 @@
+---
+title: "Spray Coverage and Deposition Analysis"
+output: html_document
+date: "2023-11-18"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+```{r}
+setwd("/home/puran/Desktop/CoverageDeposition/Data")
+
+```
+
+```{r}
+#loading data from 
+coverage_2021 <- read_excel ("ws_coverage2021.xlsx")
+coverage_2022<- read_excel ("ws_coverage2022.xlsx")
+coverage_2023 <- read_excel ("ws_coverage2023.xlsx")
+
+deposition_2021 <- read_excel ("ws_deposition2021.xlsx")
+deposition_2022 <- read_excel ("ws_deposition2022.xlsx")
+deposition_2023 <- read_excel ("ws_deposition2023.xlsx")
+```
+
+```{r}
+head(coverage_2021)
+head(deposition_2021)
+```
+
+
+```{r}
+#function to select the certain columns and rows 
+select_columns<- function (data_frame, columns_to_select){
+  selected_data <- data_frame[, columns_to_select, drop = FALSE]
+  return (selected_data)
+}
+
+cov2021 <- coverage_2021 %>%
+  select ("CardLocation", "Treatment", "PercentArea")
+head(cov2021)
+```
+
+```{r}
+select_columns <- function(data, columns) {
+  selectedData <- data %>%
+    select({{columns}})
+  return(selectedData)
+}
+
+cov2021<-select_columns (coverage_2021, c("CardLocation", "Treatment", "PercentArea"))
+cov2022<-select_columns (coverage_2022, c("CardLocation", "Treatment", "PercentArea"))
+cov2023<-select_columns (coverage_2023, c("CardLocation", "Treatment", "PercentArea"))
+dop2021 <-select_columns (deposition_2021, c("CardLocation", "Treatment", "Deposition"))
+dop2022 <-select_columns (deposition_2022, c("CardLocation", "Treatment", "Deposition"))
+dop2023 <-select_columns (deposition_2023, c("CardLocation", "Treatment", "Deposition"))
+head(cov2022)
+head(dop2023)
+```
+
+```{r}
+# Check the frequency of unique combinations in tibble1
+table(cov2021$CardLocation, cov2021$Treatment)
+table(dop2021$CardLocation, dop2021$Treatment)
+```
+
+
+```{r}
+# merging coverage and deposition
+#str (cov2021)
+#str(dop2021)
+
+merged_tibble <- left_join(cov2021, dop2021, by = c("CardLocation", "Treatment"))%>%
+  distinct(CardLocation, Treatment, .keep_all = TRUE)
+merged_tibble
+```
+
